@@ -11,7 +11,9 @@ import java.util.stream.Stream;
 public class Five {
     public static void main(String[] args) {
         List<String> input = getInput("resources/input5");
-        Map<Integer, Integer> map = new HashMap<>();
+
+        List<Integer> leftSide = new ArrayList<>();
+        List<Integer> rightSide = new ArrayList<>();
         Pattern pages = Pattern.compile("(\\d+)\\|(\\d+)");
         boolean readingPages = true;
         List<List<Integer>> inputs = new ArrayList<>();
@@ -22,21 +24,26 @@ public class Five {
                     continue;
                 }
                 Matcher m = pages.matcher(s);
-                if (m.matches()) map.put(Integer.parseInt(m.group(1)), Integer.parseInt(m.group(2)));
+                if (m.matches()) {
+                    leftSide.add(Integer.parseInt(m.group(1)));
+                    rightSide.add(Integer.parseInt(m.group(2)));
+                }
             } else {
                 inputs.add(Stream.of(s.split(",")).map(Integer::parseInt).toList());
             }
         }
 
-        // < 6342
+        List<List<Integer>> wrongOnes = new ArrayList<>();
+        // < 6342 = 5732
         // 1
         int totalSum = 0;
         for (List<Integer> list : inputs) {
 
             boolean legal = true;
-            for (int key : map.keySet()) {
-                if (!legalOrdering(list, key, map.get(key))) {
+            for (int i = 0; i < leftSide.size(); i++) {
+                if (!legalOrdering(list, leftSide.get(i), rightSide.get(i))) {
                     legal = false;
+                    wrongOnes.add(list);
                     break;
                 }
             }
@@ -45,8 +52,34 @@ public class Five {
             }
         }
         System.out.println("1: "+ totalSum);
+
+        // 2
+        totalSum = 0;
+        for (List<Integer> list : wrongOnes) {
+            List<Integer> sorted = sortList(leftSide, rightSide, new ArrayList<>(list));
+            totalSum += sorted.get(sorted.size()/2);
+        }
+        System.out.println("2: " + totalSum);
     }
 
+    private static List<Integer> sortList(List<Integer> leftSide, List<Integer> rightSide, List<Integer> line) {
+        line.sort((a,b) -> {
+            for (int i = 0; i < leftSide.size(); i++) {
+                if (leftSide.get(i) == a) {
+                    if (rightSide.get(i) == b) {
+                        return -1;
+                    }
+                } else if (leftSide.get(i) == b) {
+                    if (rightSide.get(i) == a) {
+                        return 1;
+                    }
+                }
+            }
+            return 0;
+        });
+        return line;
+
+    }
     private static boolean legalOrdering(List<Integer> list, int min, int max) {
         boolean foundMax = false;
         for (int i : list) {
