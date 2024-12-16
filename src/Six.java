@@ -32,8 +32,10 @@ public class Six {
         map = solve(map, currRow, currCol, Direction.UP);
         System.out.println("1: " + countChars(map, 'X'));
 
+        long time = System.currentTimeMillis();
         // 2
         System.out.println("2: " + getAmountOfPossibleLoops(map, currRow, currCol, Direction.UP));
+        System.out.println("TAKEN: " + (System.currentTimeMillis() - time));
     }
 
     private static class State {
