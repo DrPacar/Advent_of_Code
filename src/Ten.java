@@ -25,21 +25,28 @@ public class Ten {
             map.add(list);
         }
 
+        System.out.println(map);
         int totalCount = 0;
+        int total = 0;
         for (Point point : startingPoints) {
-            int yeah = iterateThroughMap(map, point, new int[]{1, 0, -1, 0}, new int[]{0, 1, 0, -1});
-            System.out.println("STARTING AT : "+ point + "  " + yeah);
+            int yeah = iterateThroughMap(map, point, new int[]{1, 0, -1, 0}, new int[]{0, 1, 0, -1}, new HashSet<>());
+            int dog = iterateThroughMap(map, point, new int[]{1, 0, -1, 0}, new int[]{0, 1, 0, -1}, null);
             totalCount += yeah;
+            total += dog;
         }
 
         System.out.println("1: " + totalCount);
 
+        System.out.println("2: " + total);
     }
 
-    private static int iterateThroughMap(List<List<Integer>> map, Point currPoint, int[] xDir, int[] yDir) {
+    private static int iterateThroughMap(List<List<Integer>> map, Point currPoint, int[] xDir, int[] yDir, Set<Point> visitedPeaks) {
         int valAtCurrPoint = map.get(currPoint.x).get(currPoint.y);
-        System.out.println(valAtCurrPoint);
-        if (valAtCurrPoint == 9) return 1;
+
+        if (valAtCurrPoint == 9 && (visitedPeaks == null || !visitedPeaks.contains(currPoint))) {
+            if (visitedPeaks != null) visitedPeaks.add(new Point(currPoint.x, currPoint.y));
+            return 1;
+        }
         int totalCount = 0;
         for (int i = 0; i < xDir.length; i++) {
             int x = currPoint.x + xDir[i];
@@ -47,7 +54,7 @@ public class Ten {
 
             try {
                 if (map.get(x).get(y) == valAtCurrPoint + 1) {
-                    totalCount += iterateThroughMap(map, new Point(x, y), xDir, yDir);
+                    totalCount += iterateThroughMap(map, new Point(x, y), xDir, yDir, visitedPeaks);
                 }
             } catch (Exception ignored) {}
         }
